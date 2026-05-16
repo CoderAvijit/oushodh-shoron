@@ -168,6 +168,7 @@ public class AddReminderActivity extends AppCompatActivity {
     }
 
     protected Reminder buildReminder(Reminder r) {
+        timePicker.clearFocus();
         r.setMedicineName(etName.getText().toString().trim());
         r.setNote(etNote.getText().toString().trim());
         r.setHour(timePicker.getHour());
