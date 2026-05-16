@@ -1,6 +1,7 @@
 package com.oushodh.shoron;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
@@ -30,7 +31,7 @@ public class OushodhApp extends Application {
         alarmChannel.enableVibration(true);
         alarmChannel.enableLights(true);
         alarmChannel.setBypassDnd(true);
-        alarmChannel.setLockscreenVisibility(NotificationManager.IMPORTANCE_HIGH);
+        alarmChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         alarmChannel.setSound(null, null);
         nm.createNotificationChannel(alarmChannel);
 

@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.oushodh.shoron.R;
 import com.oushodh.shoron.data.Reminder;
 import com.oushodh.shoron.ui.adapter.ReminderAdapter;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView rv = findViewById(R.id.recycler);
         emptyView = findViewById(R.id.empty_view);
-        FloatingActionButton fab = findViewById(R.id.fab_add);
+        ExtendedFloatingActionButton fab = findViewById(R.id.fab_add);
         View btnSettings = findViewById(R.id.btn_settings);
 
         adapter = new ReminderAdapter(new ReminderAdapter.Listener() {
