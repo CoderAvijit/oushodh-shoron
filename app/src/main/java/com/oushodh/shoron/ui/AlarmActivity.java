@@ -78,15 +78,15 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void onTaken() {
-        stopService(new Intent(this, AlarmService.class));
+        AlarmService.stop(getApplicationContext());
         if (reminderId >= 0) {
             final long id = reminderId;
             Executors.newSingleThreadExecutor().execute(() -> {
                 AppDatabase db = AppDatabase.getInstance(getApplicationContext());
                 db.reminderDao().markTaken(id, true, System.currentTimeMillis());
                 Reminder r = db.reminderDao().getById(id);
-                if (r != null && r.isRepeatDaily() && r.isEnabled()) {
-                    AlarmScheduler.schedule(getApplicationContext(), r);
+                if (r != null && r.isEnabled()) {
+                    AlarmScheduler.schedule(getApplicationContext(), r, true);
                 }
             });
         }
@@ -94,7 +94,7 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void onSnooze() {
-        stopService(new Intent(this, AlarmService.class));
+        AlarmService.stop(getApplicationContext());
         if (reminderId >= 0) {
             AlarmScheduler.snooze(this, reminderId, 5 * 60 * 1000L);
         }

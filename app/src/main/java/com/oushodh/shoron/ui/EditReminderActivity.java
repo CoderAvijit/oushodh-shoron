@@ -42,7 +42,12 @@ public class EditReminderActivity extends AddReminderActivity {
         etNote.setText(current.getNote() == null ? "" : current.getNote());
         timePicker.setHour(current.getHour());
         timePicker.setMinute(current.getMinute());
-        swRepeat.setChecked(current.isRepeatDaily());
+        int interval = current.getRepeatIntervalDays();
+        int rbId = R.id.rb_daily;
+        if (interval == 2) rbId = R.id.rb_2day;
+        else if (interval == 3) rbId = R.id.rb_3day;
+        else if (interval == 7) rbId = R.id.rb_weekly;
+        rgRepeat.check(rbId);
         if (current.getRingtoneUri() != null) {
             ringtoneUri = Uri.parse(current.getRingtoneUri());
             try {

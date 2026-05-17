@@ -24,17 +24,15 @@ public class AlarmActionReceiver extends BroadcastReceiver {
         if (id < 0 || action == null) return;
         final Context appCtx = context.getApplicationContext();
 
-        // Stop alarm service
-        Intent stop = new Intent(appCtx, AlarmService.class);
-        appCtx.stopService(stop);
+        AlarmService.stop(appCtx);
 
         if (ACTION_TAKEN.equals(action)) {
             Executors.newSingleThreadExecutor().execute(() -> {
                 AppDatabase db = AppDatabase.getInstance(appCtx);
                 db.reminderDao().markTaken(id, true, System.currentTimeMillis());
                 Reminder r = db.reminderDao().getById(id);
-                if (r != null && r.isRepeatDaily() && r.isEnabled()) {
-                    AlarmScheduler.schedule(appCtx, r);
+                if (r != null && r.isEnabled()) {
+                    AlarmScheduler.schedule(appCtx, r, true);
                 }
             });
         } else if (ACTION_SNOOZE.equals(action)) {

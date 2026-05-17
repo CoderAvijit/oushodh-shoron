@@ -21,6 +21,7 @@ public class Reminder {
     private String ringtoneUri;
 
     private boolean repeatDaily = true;
+    private int repeatIntervalDays = 1;
     private boolean enabled = true;
     private boolean takenToday = false;
 
@@ -51,6 +52,9 @@ public class Reminder {
 
     public boolean isRepeatDaily() { return repeatDaily; }
     public void setRepeatDaily(boolean repeatDaily) { this.repeatDaily = repeatDaily; }
+
+    public int getRepeatIntervalDays() { return repeatIntervalDays <= 0 ? 1 : repeatIntervalDays; }
+    public void setRepeatIntervalDays(int days) { this.repeatIntervalDays = days <= 0 ? 1 : days; }
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }

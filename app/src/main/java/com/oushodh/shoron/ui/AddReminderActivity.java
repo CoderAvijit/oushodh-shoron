@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -22,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.oushodh.shoron.R;
 import com.oushodh.shoron.data.Reminder;
 import com.oushodh.shoron.util.AlarmScheduler;
@@ -36,7 +36,7 @@ public class AddReminderActivity extends AppCompatActivity {
     protected ReminderViewModel vm;
     protected EditText etName, etNote;
     protected TimePicker timePicker;
-    protected MaterialSwitch swRepeat;
+    protected RadioGroup rgRepeat;
     protected TextView tvRingtone, tvVoiceStatus;
     protected Button btnPickRingtone, btnRecord, btnPlayVoice, btnSave, btnCancel;
 
@@ -85,7 +85,7 @@ public class AddReminderActivity extends AppCompatActivity {
         etNote = findViewById(R.id.et_note);
         timePicker = findViewById(R.id.time_picker);
         timePicker.setIs24HourView(false);
-        swRepeat = findViewById(R.id.sw_repeat);
+        rgRepeat = findViewById(R.id.rg_repeat);
         tvRingtone = findViewById(R.id.tv_ringtone);
         tvVoiceStatus = findViewById(R.id.tv_voice_status);
         btnPickRingtone = findViewById(R.id.btn_pick_ringtone);
@@ -173,7 +173,13 @@ public class AddReminderActivity extends AppCompatActivity {
         r.setNote(etNote.getText().toString().trim());
         r.setHour(timePicker.getHour());
         r.setMinute(timePicker.getMinute());
-        r.setRepeatDaily(swRepeat.isChecked());
+        int interval = 1;
+        int sel = rgRepeat.getCheckedRadioButtonId();
+        if (sel == R.id.rb_2day) interval = 2;
+        else if (sel == R.id.rb_3day) interval = 3;
+        else if (sel == R.id.rb_weekly) interval = 7;
+        r.setRepeatIntervalDays(interval);
+        r.setRepeatDaily(interval == 1);
         r.setEnabled(true);
         r.setRingtoneUri(ringtoneUri != null ? ringtoneUri.toString() : null);
         if (voiceFile != null) r.setVoicePath(voiceFile.getAbsolutePath());

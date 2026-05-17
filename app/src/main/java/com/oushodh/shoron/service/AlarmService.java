@@ -28,12 +28,12 @@ public class AlarmService extends Service {
 
     private static final String TAG = "AlarmService";
     public static final String EXTRA_REMINDER_ID = "extra_reminder_id";
+    public static final String ACTION_STOP = "com.oushodh.shoron.ACTION_STOP_ALARM";
 
     private MediaPlayer ringtonePlayer;
     private MediaPlayer voicePlayer;
     private Vibrator vibrator;
     private PowerManager.WakeLock wakeLock;
-    private long currentReminderId = -1;
 
     @Nullable
     @Override
@@ -54,14 +54,18 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        long id = intent != null ? intent.getLongExtra(EXTRA_REMINDER_ID, -1) : -1;
-        if (id < 0) {
-            stopSelf();
+        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
+            Log.d(TAG, "Received STOP");
+            cleanupAndStop();
             return START_NOT_STICKY;
         }
-        currentReminderId = id;
 
-        // promote to foreground immediately
+        long id = intent != null ? intent.getLongExtra(EXTRA_REMINDER_ID, -1) : -1;
+        if (id < 0) {
+            cleanupAndStop();
+            return START_NOT_STICKY;
+        }
+
         startForeground(NotificationHelper.NOTIF_ID_ALARM,
                 NotificationHelper.buildAlarmNotification(this, id, ""));
 
@@ -72,7 +76,6 @@ public class AlarmService extends Service {
                 stopSelf();
                 return;
             }
-            // update notification with name
             startForeground(NotificationHelper.NOTIF_ID_ALARM,
                     NotificationHelper.buildAlarmNotification(this, id, r.getMedicineName()));
             startRingtone(r.getRingtoneUri());
@@ -81,6 +84,36 @@ public class AlarmService extends Service {
         });
 
         return START_STICKY;
+    }
+
+    private void cleanupAndStop() {
+        releaseMedia();
+        try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
+        stopSelf();
+    }
+
+    private void releaseMedia() {
+        try {
+            if (ringtonePlayer != null) {
+                if (ringtonePlayer.isPlaying()) ringtonePlayer.stop();
+                ringtonePlayer.release();
+            }
+        } catch (Exception ignored) {}
+        ringtonePlayer = null;
+
+        try {
+            if (voicePlayer != null) {
+                if (voicePlayer.isPlaying()) voicePlayer.stop();
+                voicePlayer.release();
+            }
+        } catch (Exception ignored) {}
+        voicePlayer = null;
+
+        try { if (vibrator != null) vibrator.cancel(); } catch (Exception ignored) {}
+        vibrator = null;
+
+        try { if (wakeLock != null && wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) {}
+        wakeLock = null;
     }
 
     private void startRingtone(String uriStr) {
@@ -145,16 +178,21 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
-        try { if (ringtonePlayer != null) { ringtonePlayer.stop(); ringtonePlayer.release(); } }
-        catch (Exception ignored) {}
-        ringtonePlayer = null;
-        try { if (voicePlayer != null) { voicePlayer.stop(); voicePlayer.release(); } }
-        catch (Exception ignored) {}
-        voicePlayer = null;
-        try { if (vibrator != null) vibrator.cancel(); } catch (Exception ignored) {}
-        vibrator = null;
-        try { if (wakeLock != null && wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) {}
-        wakeLock = null;
+        releaseMedia();
         super.onDestroy();
+    }
+
+    public static void stop(android.content.Context ctx) {
+        Intent i = new Intent(ctx, AlarmService.class);
+        i.setAction(ACTION_STOP);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ctx.startForegroundService(i);
+            } else {
+                ctx.startService(i);
+            }
+        } catch (Exception e) {
+            ctx.stopService(new Intent(ctx, AlarmService.class));
+        }
     }
 }

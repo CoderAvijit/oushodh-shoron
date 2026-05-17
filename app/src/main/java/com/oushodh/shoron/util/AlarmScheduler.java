@@ -19,11 +19,15 @@ public class AlarmScheduler {
     public static final String EXTRA_SNOOZE = "extra_snooze";
 
     public static void schedule(Context ctx, Reminder r) {
+        schedule(ctx, r, false);
+    }
+
+    public static void schedule(Context ctx, Reminder r, boolean afterTaken) {
         if (r == null || !r.isEnabled()) return;
         AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
 
-        long triggerAt = computeNextTrigger(r.getHour(), r.getMinute());
+        long triggerAt = computeNextTrigger(r, afterTaken);
         PendingIntent pi = buildPi(ctx, r.getId());
 
         try {
@@ -36,7 +40,7 @@ public class AlarmScheduler {
             } else {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
             }
-            Log.d(TAG, "Scheduled id=" + r.getId() + " at " + triggerAt);
+            Log.d(TAG, "Scheduled id=" + r.getId() + " at " + triggerAt + " afterTaken=" + afterTaken);
         } catch (SecurityException e) {
             Log.e(TAG, "Exact alarm denied; using inexact", e);
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
@@ -48,11 +52,12 @@ public class AlarmScheduler {
         if (am == null) return;
         long triggerAt = System.currentTimeMillis() + delayMillis;
         Intent i = new Intent(ctx, AlarmReceiver.class);
+        i.setAction("com.oushodh.shoron.ALARM_FIRE_" + reminderId);
         i.putExtra(EXTRA_REMINDER_ID, reminderId);
         i.putExtra(EXTRA_SNOOZE, true);
         PendingIntent pi = PendingIntent.getBroadcast(
                 ctx,
-                (int) (reminderId * 10 + 1),
+                (int) reminderId,
                 i,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -84,13 +89,18 @@ public class AlarmScheduler {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-    private static long computeNextTrigger(int hour, int minute) {
+    private static long computeNextTrigger(Reminder r, boolean afterTaken) {
+        int interval = Math.max(1, r.getRepeatIntervalDays());
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, hour);
-        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.HOUR_OF_DAY, r.getHour());
+        c.set(Calendar.MINUTE, r.getMinute());
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        if (c.getTimeInMillis() <= System.currentTimeMillis()) {
+        long now = System.currentTimeMillis();
+
+        if (afterTaken) {
+            c.add(Calendar.DAY_OF_YEAR, interval);
+        } else if (c.getTimeInMillis() <= now) {
             c.add(Calendar.DAY_OF_YEAR, 1);
         }
         return c.getTimeInMillis();

@@ -68,24 +68,58 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:orientation="vertical"
             android:padding="16dp"
             android:background="@drawable/card_bg"
             android:layout_marginTop="16dp">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/repeat_daily"
-                style="@style/BigLabel" />
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/sw_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true" />
+                android:text="@string/repeat_label"
+                style="@style/BigLabel"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/rg_repeat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <RadioButton
+                    android:id="@+id/rb_daily"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="56dp"
+                    android:textSize="18sp"
+                    android:text="@string/repeat_every_day"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rb_2day"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="56dp"
+                    android:textSize="18sp"
+                    android:text="@string/repeat_2_days" />
+
+                <RadioButton
+                    android:id="@+id/rb_3day"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="56dp"
+                    android:textSize="18sp"
+                    android:text="@string/repeat_3_days" />
+
+                <RadioButton
+                    android:id="@+id/rb_weekly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="56dp"
+                    android:textSize="18sp"
+                    android:text="@string/repeat_weekly" />
+            </RadioGroup>
         </LinearLayout>
 
         <LinearLayout

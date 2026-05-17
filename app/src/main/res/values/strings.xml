@@ -8,6 +8,11 @@
     <string name="optional_note">অতিরিক্ত নোট (ঐচ্ছিক)</string>
     <string name="reminder_time">সময়</string>
     <string name="repeat_daily">প্রতিদিন পুনরাবৃত্তি</string>
+    <string name="repeat_label">পুনরাবৃত্তি</string>
+    <string name="repeat_every_day">প্রতিদিন</string>
+    <string name="repeat_2_days">২ দিন অন্তর</string>
+    <string name="repeat_3_days">৩ দিন অন্তর</string>
+    <string name="repeat_weekly">সাপ্তাহিক</string>
     <string name="ringtone">রিংটোন</string>
     <string name="default_ringtone">ডিফল্ট অ্যালার্ম</string>
     <string name="choose_ringtone">রিংটোন বেছে নিন</string>
